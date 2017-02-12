@@ -8,20 +8,7 @@ gulp.task('scss', _ => {
     .pipe(gulp.dest('./public/css'));
 });
 
-gulp.task('browserSync', _ => {
-  browserSync.init(['./public'], {
-    server: {
-      baseDir: './public'
-    }
-  });
-});
-
-gulp.task('livereload', _ => {
-  gulp.src('./public/**/*')
-  .pipe(connect.reload());
-});
-
-gulp.task('watch', ['browserSync'], _ => {
+gulp.task('watch', _ => {
   gulp.watch('./scss/**/*.scss', ['scss']);
 });
 
