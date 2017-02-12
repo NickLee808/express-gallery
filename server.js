@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const {User} = db;
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -33,6 +32,4 @@ app.delete('/gallery/:id', (req, res) => {
 
 });
 
-app.listen(3000, () => {
-
-});
+app.listen(3000, _ => console.log(`Server listening on port ${3000}`));
