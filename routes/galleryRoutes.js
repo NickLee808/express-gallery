@@ -11,11 +11,13 @@ router.route('/:id')
   .put((req, res) => {
 
   })
-  .post((req, res) => {
-    res.redirect();
-  })
   .delete((req, res) => {
-    res.redirect();
+    res.redirect('');
+  });
+
+router.route('/')
+  .post((req, res) => {
+    res.redirect('');
   });
 
 router.route('/new')
