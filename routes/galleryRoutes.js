@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const galleryModel = require('../db/gallery');
 
-router.get('/gallery/:id', (req, res) => {
-  galleryModel.getPhotoById(req.params.id)
-    .then(photos => {
-      console.log(photos);
-    });
-});
+router.route('/:id')
+  .get((req, res) => {
+    res.render('');
+  })
+  .put((req, res) => {
+
+  });
 
 module.exports = router;
