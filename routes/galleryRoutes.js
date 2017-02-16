@@ -9,7 +9,7 @@ router.route('/:id')
     res.render('');
   })
   .put((req, res) => {
-
+    res.render('');
   })
   .delete((req, res) => {
     res.redirect('');
