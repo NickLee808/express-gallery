@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const db = require('./../models');
-const {Photo} = db;
+var PhotoModel = require('./../models').photo;
+
 
 router.route('/:id')
   .get((req, res) => {
@@ -17,7 +17,14 @@ router.route('/:id')
 
 router.route('/')
   .post((req, res) => {
-    res.redirect('');
+  PhotoModel.create({
+      author: req.body.author,
+      link: req.body.link,
+      description: req.body.description
+    })
+      .then((photo) => {
+        res.redirect(`/gallery/${photo.id}`);
+      });
   });
 
 router.route('/new')

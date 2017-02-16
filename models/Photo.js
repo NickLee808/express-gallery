@@ -1,8 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
-  var Photo = sequelize.define('Photo', {
+  var PhotoModel = sequelize.define('photo', {
     author: DataTypes.STRING,
     link: DataTypes.STRING,
     description: DataTypes.STRING
   });
-  return Photo;
+  return PhotoModel;
 };
