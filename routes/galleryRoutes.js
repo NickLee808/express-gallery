@@ -5,7 +5,14 @@ var PhotoModel = require('./../models').photo;
 
 router.route('/:id')
   .get((req, res) => {
-    res.render('');
+    PhotoModel.findOne({
+      where: {
+        id : req.params.id
+      }
+    })
+      .then((photo) => {
+        res.render('./gallery/photo', photo.dataValues);
+      });
   })
   .put((req, res) => {
     res.render('');

@@ -36,21 +36,18 @@ const authenticate = (username, password) => {
 };
 
 passport.use(new LocalStrategy((username, password, done) => {
-    console.log('username, password: ', username, password);
-    if( authenticate(username, password) ) {
-
-      const user = {
-        name: 'Joe',
-        role: 'admin',
-        favColor: 'green',
-        isAdmin: true,
-      };
-
-      return done(null, user);
-    }
-    return done(null, false);
+  console.log('username, password: ', username, password);
+  if(authenticate(username, password)) {
+    const user = {
+      name: 'Joe',
+      role: 'admin',
+      favColor: 'green',
+      isAdmin: true,
+    };
+    return done(null, user);
   }
-));
+  return done(null, false);
+}));
 
 passport.serializeUser((user, done) => {
   return done(null, user);
