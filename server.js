@@ -50,6 +50,14 @@ passport.use(new LocalStrategy((username, password, done) => {
   }
 ));
 
+passport.serializeUser((user, done) => {
+  return done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  return done(err, user);
+});
+
 app.get('/login', (req, res) => {
   res.render('./login');
 });
