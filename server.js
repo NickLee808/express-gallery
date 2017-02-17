@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const app = express();
 const galleryRoutes = require('./routes/galleryRoutes');
+const secretRoutes = require('./routes/secretRoutes');
 
 var db = require('./models');
 var Photo = db.Photo;
@@ -26,6 +27,7 @@ app.use(session({
 }));
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 const authenticate = (username, password) => {
   const { USERNAME } = CONFIG;
@@ -55,7 +57,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((user, done) => {
-  return done(err, user);
+  return done(null, user);
 });
 
 app.get('/login', (req, res) => {
@@ -67,9 +69,11 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: '/login'
 }));
 
-app.get('/secret', (req, res) => {
+app.use('/secret', secretRoutes);
+
+/*app.get('/secret', (req, res) => {
   res.send('this is my secret page');
-});
+});*/
 
 app.engine('hbs', hbs.engine);
 

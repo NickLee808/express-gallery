@@ -3,7 +3,6 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 var PhotoModel = require('./../models').photo;
 
-
 router.route('/:id')
   .get((req, res) => {
     res.render('');
