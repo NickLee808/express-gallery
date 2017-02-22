@@ -68,10 +68,6 @@ app.post('/login', passport.authenticate('local', {
 
 app.use('/secret', secretRoutes);
 
-/*app.get('/secret', (req, res) => {
-  res.send('this is my secret page');
-});*/
-
 app.engine('hbs', hbs.engine);
 
 app.set('view engine', 'hbs');
