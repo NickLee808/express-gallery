@@ -6,7 +6,7 @@ const galleryRoutes = require('./routes/galleryRoutes');
 const secretRoutes = require('./routes/secretRoutes');
 
 var db = require('./models');
-var Photo = db.Photo;
+var PhotoModel = require('./models').photo;
 
 const path = require('path');
 const bodyparser = require('body-parser');
@@ -75,7 +75,11 @@ app.set('view engine', 'hbs');
 app.use('/gallery', galleryRoutes);
 
 app.get('/', (req, res) => {
-  res.render('');
+  PhotoModel.findAll()
+    .then((photos) => {
+      console.log(photos);
+      res.render(`index`, {photos});
+    });
 });
 
 app.listen(3000, _ => db.sequelize.sync());

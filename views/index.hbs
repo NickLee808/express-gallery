@@ -1,2 +1,12 @@
 <h1>_ARCHITEKT</h1>
-<div>div</div>
+{{#each photos}}  
+  <div class="photoContainer">
+    <a href="/gallery/{{id}}" class="photoLink-single">
+      <img src="{{link}}" class="photo">
+    <br>
+    <div class="authors-descriptions">
+      {{author}} -<br>{{link}} 
+    </div> 
+    </a>
+  </div>
+{{/each}}
