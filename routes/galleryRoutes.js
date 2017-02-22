@@ -10,8 +10,14 @@ router.route('/:id')
         id : req.params.id
       }
     })
+      .then(photo => {
+        return photo.get({
+          plain: true
+        });
+      })
       .then((photo) => {
-        res.render(`details`);
+        console.log('photo', photo);
+        res.render(`details`, photo);
       });
   })
   .put((req, res) => {
@@ -29,6 +35,7 @@ router.route('/')
       description: req.body.description
     })
       .then((photo) => {
+        console.log("req.body.link", req.body.link);
         res.redirect(303, `/gallery/${photo.id}`);
       });
   });
