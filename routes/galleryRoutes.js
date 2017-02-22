@@ -11,7 +11,7 @@ router.route('/:id')
       }
     })
       .then((photo) => {
-        res.render('./gallery/photo', photo.dataValues);
+        res.render(`details`);
       });
   })
   .put((req, res) => {
@@ -29,7 +29,7 @@ router.route('/')
       description: req.body.description
     })
       .then((photo) => {
-        res.redirect(`/gallery/${photo.id}`);
+        res.redirect(303, `/gallery/${photo.id}`);
       });
   });
 
