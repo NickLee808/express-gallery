@@ -4,7 +4,7 @@ const handlebars = require('express-handlebars');
 const app = express();
 const galleryRoutes = require('./routes/galleryRoutes');
 const secretRoutes = require('./routes/secretRoutes');
-
+const methodOverride = require('method-override');
 var db = require('./models');
 var PhotoModel = require('./models').photo;
 
@@ -21,6 +21,7 @@ const hbs = handlebars.create({
 });
 
 app.use(bodyparser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 
 app.use(session({
   secret: CONFIG.SESSION_SECRET
