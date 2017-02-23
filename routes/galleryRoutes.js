@@ -12,7 +12,7 @@ router.route('/:id')
   .get((req, res) => {
     PhotoModel.findOne({
       where: {
-        id : req.params.id
+        id: req.params.id
       }
     })
       .then(photo => {
@@ -25,10 +25,29 @@ router.route('/:id')
       });
   })
   .put((req, res) => {
-    res.render('');
+    PhotoModel.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then((photo) => {
+        photo.update({
+          author: req.body.author,
+          link: req.body.link,
+          description: req.body.description
+        });
+      });
   })
   .delete((req, res) => {
-    res.redirect('');
+    PhotoModel.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then((photo) => {
+        photo.destroy();
+        res.render(`index`, {photo});
+      });
   });
 
 router.route('/')
