@@ -65,13 +65,13 @@ router.route('/')
 
 router.route('/:id/edit')
   .get((req, res) => {
-    Photo.findOne({
+    PhotoModel.findOne({
       where: {
         id : req.params.id
       }
     })
       .then((photo) => {
-        res.render('./gallery/edit', photo.dataValues);
+        res.render('editForm');
       });
   });
 
