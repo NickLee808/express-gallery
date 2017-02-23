@@ -5,7 +5,7 @@ var PhotoModel = require('./../models').photo;
 
 router.route('/new')
   .get((req, res) => {
-    res.render(`form`);
+    res.render(`newForm`);
   });
 
 router.route('/:id')
@@ -20,9 +20,10 @@ router.route('/:id')
           plain: true
         });
       })
-      .then((photo) => {
-        res.render(`details`, {photo:photo});
-      });
+       .then((photo) => {
+        console.log(photo);
+         res.render(`details`, {photo});
+       });
   })
   .put((req, res) => {
     PhotoModel.findOne({
@@ -64,7 +65,14 @@ router.route('/')
 
 router.route('/:id/edit')
   .get((req, res) => {
-    res.render('');
+    Photo.findOne({
+      where: {
+        id : req.params.id
+      }
+    })
+      .then((photo) => {
+        res.render('./gallery/edit', photo.dataValues);
+      });
   });
 
 module.exports = router;
