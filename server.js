@@ -77,7 +77,6 @@ app.use('/gallery', galleryRoutes);
 app.get('/', (req, res) => {
   PhotoModel.findAll()
     .then((photos) => {
-      console.log(photos);
       res.render(`index`, {photos});
     });
 });

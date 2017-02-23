@@ -3,6 +3,11 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 var PhotoModel = require('./../models').photo;
 
+router.route('/new')
+  .get((req, res) => {
+    res.render(`form`);
+  });
+
 router.route('/:id')
   .get((req, res) => {
     PhotoModel.findOne({
@@ -16,8 +21,7 @@ router.route('/:id')
         });
       })
       .then((photo) => {
-        console.log('photo', photo);
-        res.render(`details`, photo);
+        res.render(`details`, {photo:photo});
       });
   })
   .put((req, res) => {
@@ -29,20 +33,14 @@ router.route('/:id')
 
 router.route('/')
   .post((req, res) => {
-  PhotoModel.create({
+    PhotoModel.create({
       author: req.body.author,
       link: req.body.link,
       description: req.body.description
     })
       .then((photo) => {
-        console.log("req.body.link", req.body.link);
         res.redirect(303, `/gallery/${photo.id}`);
       });
-  });
-
-router.route('/new')
-  .get((req, res) => {
-    res.render('');
   });
 
 router.route('/:id/edit')
