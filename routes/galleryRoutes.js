@@ -21,7 +21,6 @@ router.route('/:id')
         });
       })
        .then((photo) => {
-        console.log(photo);
          res.render(`details`, {photo});
        });
   })
@@ -36,7 +35,10 @@ router.route('/:id')
           author: req.body.author,
           link: req.body.link,
           description: req.body.description
-        });
+        })
+          .then((photo) => {
+            res.redirect(303, `/gallery/${photo.id}`);
+          });
       });
   })
   .delete((req, res) => {
@@ -47,7 +49,10 @@ router.route('/:id')
     })
       .then((photo) => {
         photo.destroy();
-        res.render(`index`, {photo});
+        PhotoModel.findAll()
+          .then((photos) => {
+            res.render(`index`, {photos});
+          });
       });
   });
 
@@ -70,8 +75,25 @@ router.route('/:id/edit')
         id : req.params.id
       }
     })
+      .then(photo => {
+        return photo.get({
+          plain: true
+        });
+      })
       .then((photo) => {
-        res.render('editForm');
+        res.render('editForm', {photo});
+      });
+  });
+
+router.route('/:id/delete')
+  .get((req, res) => {
+    PhotoModel.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then((photo) => {
+        res.render(`deleteForm`, {photo});
       });
   });
 

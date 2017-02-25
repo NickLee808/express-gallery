@@ -50,13 +50,7 @@ passport.use(new LocalStrategy((username, password, done) => {
   return done(null, false);
 }));
 
-passport.serializeUser((user, done) => {
-  return done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-  return done(null, user);
-});
+app.use(express.static('./public'));
 
 app.get('/login', (req, res) => {
   res.render('./login');

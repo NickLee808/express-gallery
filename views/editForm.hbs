@@ -1,9 +1,9 @@
-<form name="newPhoto" id="newPhoto" action="/gallery/new" method="POST">
+<form name="editPhoto" id="editPhoto" action="/gallery/{{photo.id}}?_method=PUT" method="POST">
   <label for="author">Author</label>
   <input type="text" name="author">
   <label for="link">Link</label>
   <input type="text" name="link">
   <label for="description">Description</label>
   <input type="text" name="description">
-  <input id="newPhoto" type="submit" value="Submit">
+  <input id="editPhoto" type="submit" value="Submit">
 </form>
