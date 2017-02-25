@@ -7,6 +7,7 @@ const secretRoutes = require('./routes/secretRoutes');
 const methodOverride = require('method-override');
 var db = require('./models');
 var PhotoModel = require('./models').photo;
+var UserModel = require('./models').user;
 
 const path = require('path');
 const bodyparser = require('body-parser');
