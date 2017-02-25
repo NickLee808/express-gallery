@@ -57,6 +57,25 @@ app.get('/login', (req, res) => {
   res.render('./login');
 });
 
+app.post('/user/new', (req, res) => {
+  console.log('req.body.username: ', req.body.username);
+  console.log('req.body.password: ', req.body.password);
+
+  bcrypt.genSalt(saltRounds, (err, salt) => {
+    bcrypt.hash(req.body.password, salt, (err, hash) => {
+      console.log('hash', hash);
+      User.create({
+        username: req.body.username,
+        password: hash
+      })
+        .then(_ => {
+          res.redirect('/login');
+        });
+    });
+  });
+
+});
+
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/secret',
   failureRedirect: '/login'
