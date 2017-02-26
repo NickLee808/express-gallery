@@ -9,11 +9,14 @@ var db = require('./models');
 var PhotoModel = require('./models').photo;
 var UserModel = require('./models').user;
 
+const saltRounds = 10;
 const path = require('path');
 const bodyparser = require('body-parser');
 const CONFIG = require('./config/config.json');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 const passport = require('passport');
+const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
 
 const hbs = handlebars.create({
@@ -25,11 +28,20 @@ app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 
 app.use(session({
-  secret: CONFIG.SESSION_SECRET
+  store: new RedisStore(),
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+function checkPassword(password){
+  return bcrypt.compare(password, hash, (err, res) => {
+    return res;
+  });
+}
 
 const authenticate = (username, password) => {
   const { USERNAME } = CONFIG;
@@ -38,18 +50,32 @@ const authenticate = (username, password) => {
 };
 
 passport.use(new LocalStrategy((username, password, done) => {
-  console.log('username, password: ', username, password);
-  if(authenticate(username, password)) {
-    const user = {
-      name: 'Joe',
-      role: 'admin',
-      favColor: 'green',
-      isAdmin: true,
-    };
-    return done(null, user);
+    UserModel.findOne({
+      where: {
+        username: username
+      }
+    }).then (user => {
+      if (user === null) {
+        console.log('user failed');
+        return done(null, false, {message: 'bad username'});
+      }else{
+        bcrypt.compare(password, user.password).then(res => {
+          if (res) {
+            return done(null, username);
+          }else{
+            return done(null, false, {message: 'bad password'});
+          }
+        });
+      }
+    }).catch(err => {
+      console.log('error: ', err);
+    });
   }
-  return done(null, false);
-}));
+));
+
+passport.serializeUser((user, done) => done(null, user));
+
+passport.deserializeUser((user, done) => done(null, user));
 
 app.use(express.static('./public'));
 
@@ -60,26 +86,32 @@ app.get('/login', (req, res) => {
 app.post('/user/new', (req, res) => {
   console.log('req.body.username: ', req.body.username);
   console.log('req.body.password: ', req.body.password);
-
   bcrypt.genSalt(saltRounds, (err, salt) => {
     bcrypt.hash(req.body.password, salt, (err, hash) => {
       console.log('hash', hash);
-      User.create({
+      UserModel.create({
         username: req.body.username,
         password: hash
-      })
-        .then(_ => {
-          res.redirect('/login');
-        });
+      }).then(_ => {
+        res.redirect('/login');
+      });
     });
   });
 
 });
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/secret',
+  successRedirect: '/',
   failureRedirect: '/login'
 }));
+
+function isAuthenticated(req, res, next){
+  if(req.isAuthenticated()) {
+    next();
+  }else{
+    res.redirect('/login');
+  }
+}
 
 app.use('/secret', secretRoutes);
 
@@ -90,10 +122,9 @@ app.set('view engine', 'hbs');
 app.use('/gallery', galleryRoutes);
 
 app.get('/', (req, res) => {
-  PhotoModel.findAll()
-    .then((photos) => {
-      res.render(`index`, {photos});
-    });
+  PhotoModel.findAll().then((photos) => {
+    res.render(`index`, {photos});
+  });
 });
 
 app.listen(3000, _ => db.sequelize.sync());
