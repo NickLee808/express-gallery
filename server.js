@@ -97,7 +97,6 @@ app.post('/user/new', (req, res) => {
       });
     });
   });
-
 });
 
 app.post('/login', passport.authenticate('local', {
