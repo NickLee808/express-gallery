@@ -4,11 +4,10 @@ const handlebars = require('express-handlebars');
 const app = express();
 const galleryRoutes = require('./routes/galleryRoutes');
 const secretRoutes = require('./routes/secretRoutes');
-const methodOverride = require('method-override');
 var db = require('./models');
 var PhotoModel = require('./models').photo;
 var UserModel = require('./models').user;
-
+const methodOverride = require('method-override');
 const saltRounds = 10;
 const path = require('path');
 const bodyparser = require('body-parser');
@@ -18,15 +17,24 @@ const RedisStore = require('connect-redis')(session);
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
-
+const flash = require('connect-flash');
+const cookieParser = require('cookie-parser');
 const hbs = handlebars.create({
   extname: '.hbs',
   defaultLayout: 'app'
 });
 
+app.use('/secret', secretRoutes);
+app.use('/gallery', galleryRoutes);
+app.use(express.static('./public'));
+app.use(cookieParser());
+app.use(bodyParser());
+app.use(session({ secret: 'keyboard_cat' }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
-
+app.use(flash());
 app.use(session({
   store: new RedisStore(),
   secret: 'keyboard cat',
@@ -34,8 +42,9 @@ app.use(session({
   saveUninitialized: true
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.set('view engine', 'hbs');
+
+app.engine('hbs', hbs.engine);
 
 function checkPassword(password){
   return bcrypt.compare(password, hash, (err, res) => {
@@ -49,35 +58,44 @@ const authenticate = (username, password) => {
   return ( username === USERNAME && password === PASSWORD );
 };
 
-passport.use(new LocalStrategy((username, password, done) => {
-    UserModel.findOne({
-      where: {
-        username: username
-      }
-    }).then (user => {
-      if (user === null) {
-        console.log('user failed');
-        return done(null, false, {message: 'bad username'});
-      }else{
-        bcrypt.compare(password, user.password).then(res => {
-          if (res) {
-            return done(null, username);
-          }else{
-            return done(null, false, {message: 'bad password'});
-          }
-        });
-      }
-    }).catch(err => {
-      console.log('error: ', err);
-    });
+function isAuthenticated(req, res, next){
+  if(req.isAuthenticated()) {
+    next();
+  }else{
+    res.redirect('/login');
   }
-));
+}
+
+passport.use(new LocalStrategy((username, password, done) => {
+  UserModel.findOne({
+    where: {
+      username: username
+    }
+  }).then (user => {
+    if (user === null) {
+      console.log('user failed');
+      return done(null, false, {message: 'bad username'});
+    }else{
+      bcrypt.compare(password, user.password).then(res => {
+        if (res) {
+          return done(null, username);
+        }else{
+          return done(null, false, {message: 'bad password'});
+        }
+      });
+    }
+  }).catch(err => {
+    console.log('error: ', err);
+  });
+}));
 
 passport.serializeUser((user, done) => done(null, user));
 
 passport.deserializeUser((user, done) => done(null, user));
 
-app.use(express.static('./public'));
+passport.authenticate('local', {failureFlash: 'Invalid login'});
+
+passport.authenticate('local', {successFlash: 'Welcome!'});
 
 app.get('/login', (req, res) => {
   res.render('./login');
@@ -101,24 +119,9 @@ app.post('/user/new', (req, res) => {
 
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/',
-  failureRedirect: '/login'
+  failureRedirect: '/login',
+  failureFlash: true
 }));
-
-function isAuthenticated(req, res, next){
-  if(req.isAuthenticated()) {
-    next();
-  }else{
-    res.redirect('/login');
-  }
-}
-
-app.use('/secret', secretRoutes);
-
-app.engine('hbs', hbs.engine);
-
-app.set('view engine', 'hbs');
-
-app.use('/gallery', galleryRoutes);
 
 app.get('/', (req, res) => {
   PhotoModel.findAll().then((photos) => {
