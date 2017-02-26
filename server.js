@@ -2,11 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const app = express();
-const galleryRoutes = require('./routes/galleryRoutes');
+const loginRoutes = require('./routes/loginRoutes');
 const secretRoutes = require('./routes/secretRoutes');
-var db = require('./models');
-var PhotoModel = require('./models').photo;
-var UserModel = require('./models').user;
+const galleryRoutes = require('./routes/galleryRoutes');
 const methodOverride = require('method-override');
 const saltRounds = 10;
 const path = require('path');
@@ -24,12 +22,16 @@ const hbs = handlebars.create({
   defaultLayout: 'app'
 });
 
+var db = require('./models');
+var PhotoModel = require('./models').photo;
+var UserModel = require('./models').user;
+
+app.use('/login', loginRoutes);
 app.use('/secret', secretRoutes);
 app.use('/gallery', galleryRoutes);
 app.use(express.static('./public'));
 app.use(cookieParser());
 app.use(bodyParser());
-app.use(session({ secret: 'keyboard_cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
@@ -91,15 +93,17 @@ passport.use(new LocalStrategy((username, password, done) => {
 
 passport.serializeUser((user, done) => done(null, user));
 
-passport.deserializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => {
+  UserModel.findOne({
+    where: {
+      id: user.id
+    }
+  }).then (user => done(null, user));
+});
 
 passport.authenticate('local', {failureFlash: 'Invalid login'});
 
 passport.authenticate('local', {successFlash: 'Welcome!'});
-
-app.get('/login', (req, res) => {
-  res.render('./login');
-});
 
 app.post('/user/new', (req, res) => {
   console.log('req.body.username: ', req.body.username);
@@ -116,12 +120,6 @@ app.post('/user/new', (req, res) => {
     });
   });
 });
-
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
 
 app.get('/', (req, res) => {
   PhotoModel.findAll().then((photos) => {
