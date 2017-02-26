@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const bodyParser = require('body-parser');
 var PhotoModel = require('./../models').photo;
 
 function isAuthenticated(req, res, next){
@@ -13,6 +12,11 @@ function isAuthenticated(req, res, next){
 
 router.route('/new').get(isAuthenticated, (req, res) => {
   res.render(`newForm`);
+});
+
+router.post('/test', (req, res) => {
+  console.log('test case: ', req.body);
+  res.end('hello');
 });
 
 router.route('/:id').get((req, res) => {

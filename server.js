@@ -1,3 +1,6 @@
+var db = require('./models');
+var PhotoModel = require('./models').photo;
+var UserModel = require('./models').user;
 const express = require('express');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
@@ -22,22 +25,15 @@ const hbs = handlebars.create({
   defaultLayout: 'app'
 });
 
-var db = require('./models');
-var PhotoModel = require('./models').photo;
-var UserModel = require('./models').user;
-
-app.use('/login', loginRoutes);
-app.use('/secret', secretRoutes);
-app.use('/gallery', galleryRoutes);
 app.use(express.static('./public'));
 app.use(cookieParser());
-app.use(bodyParser());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(flash());
 app.use(session({
+  cookie: {maxAge: 60000},
   store: new RedisStore(),
   secret: 'keyboard cat',
   resave: false,
@@ -73,7 +69,7 @@ passport.use(new LocalStrategy((username, password, done) => {
     where: {
       username: username
     }
-  }).then (user => {
+  }).then(user => {
     if (user === null) {
       console.log('user failed');
       return done(null, false, {message: 'bad username'});
@@ -120,6 +116,11 @@ app.post('/user/new', (req, res) => {
     });
   });
 });
+
+//DO NOT MOVE
+app.use('/login', loginRoutes);
+app.use('/secret', secretRoutes);
+app.use('/gallery', galleryRoutes);
 
 app.get('/', (req, res) => {
   PhotoModel.findAll().then((photos) => {
