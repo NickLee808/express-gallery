@@ -25,12 +25,16 @@ const hbs = handlebars.create({
   defaultLayout: 'app'
 });
 
+//DO NOT MOVE OR CHANGE ORDER
 app.use(express.static('./public'));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
+app.use('/login', loginRoutes);
+app.use('/secret', secretRoutes);
+app.use('/gallery', galleryRoutes);
 app.use(flash());
 app.use(session({
   cookie: {maxAge: 60000},
@@ -117,10 +121,9 @@ app.post('/user/new', (req, res) => {
   });
 });
 
-//DO NOT MOVE
-app.use('/login', loginRoutes);
-app.use('/secret', secretRoutes);
-app.use('/gallery', galleryRoutes);
+app.get('/registration', (req, res) => {
+  res.redirect('/registration');
+});
 
 app.get('/', (req, res) => {
   PhotoModel.findAll().then((photos) => {
