@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const app = express();
 const loginRoutes = require('./routes/loginRoutes');
+const registerRoutes = require('./routes/registerRoutes');
 const secretRoutes = require('./routes/secretRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const methodOverride = require('method-override');
@@ -16,7 +17,7 @@ const CONFIG = require('./config/config.json');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const passport = require('passport');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt-nodejs');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
@@ -33,6 +34,7 @@ app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use('/login', loginRoutes);
+app.use('/register', registerRoutes);
 app.use('/secret', secretRoutes);
 app.use('/gallery', galleryRoutes);
 app.use(flash());
@@ -78,8 +80,8 @@ passport.use(new LocalStrategy((username, password, done) => {
       console.log('user failed');
       return done(null, false, {message: 'bad username'});
     }else{
-      bcrypt.compare(password, user.password).then(res => {
-        if (res) {
+      bcrypt.compare(password, user.password, (err, res) => {
+      if (res) {
           return done(null, username);
         }else{
           return done(null, false, {message: 'bad password'});
@@ -119,10 +121,6 @@ app.post('/user/new', (req, res) => {
       });
     });
   });
-});
-
-app.get('/registration', (req, res) => {
-  res.redirect('/registration');
 });
 
 app.get('/', (req, res) => {

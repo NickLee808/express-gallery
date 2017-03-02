@@ -1,6 +1,6 @@
 <h1><a href ="/">_ARCHITEKT</a></h1>
 
-<form action = "/login" method = "post">
+<form action = "/login" method = "POST">
   <div>
     <label>Username:</label>
     <input type="text" name="username"/>
@@ -8,13 +8,17 @@
   <div>
     <label>Password:</label>
     <input type="password" name="password"/>
+    <input type="submit" value="LOG IN"/>
   </div>
   <div>
-    <input type="submit" value="Log in"/>
   </div>
 </form>
 <br>
-<input id="newPhoto" type="submit" onclick="location.href='/gallery/new';" value="NEU">
+
+<input id="newUser" type="submit" onclick="location.href='/register';" value="NEW USER">
+<p>
+
+<input id="newPhoto" type="submit" onclick="location.href='/gallery/new';" value="NEW PHOTO">
 <p>
 {{#each photos}}  
   <div class="photoContainer">
