@@ -14,7 +14,7 @@ router.route('/').post((req, res) => {
         username: req.body.username,
         password: hash,
       }).then((user) => {
-        res.render(`userProfile`);
+        res.render(`index`);
       });
     });
   });
