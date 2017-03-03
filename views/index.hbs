@@ -16,9 +16,10 @@
 <br>
 
 <input id="newUser" type="submit" onclick="location.href='/register';" value="NEW USER">
-<p>
 
+{{#if loggedIn}}
 <input id="newPhoto" type="submit" onclick="location.href='/gallery/new';" value="NEW PHOTO">
+{{/if}}
 <p>
 {{#each photos}}  
   <div class="photoContainer">

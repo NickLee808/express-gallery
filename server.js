@@ -29,14 +29,8 @@ const hbs = handlebars.create({
 //DO NOT MOVE OR CHANGE ORDER
 app.use(express.static('./public'));
 app.use(cookieParser());
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
-app.use('/login', loginRoutes);
-app.use('/register', registerRoutes);
-app.use('/secret', secretRoutes);
-app.use('/gallery', galleryRoutes);
 app.use(flash());
 app.use(session({
   cookie: {maxAge: 60000},
@@ -45,6 +39,12 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/login', loginRoutes);
+app.use('/register', registerRoutes);
+app.use('/secret', secretRoutes);
+app.use('/gallery', galleryRoutes);
 
 app.set('view engine', 'hbs');
 
@@ -71,6 +71,7 @@ function isAuthenticated(req, res, next){
 }
 
 passport.use(new LocalStrategy((username, password, done) => {
+  console.log('using LocalStrategy');
   UserModel.findOne({
     where: {
       username: username
@@ -82,7 +83,7 @@ passport.use(new LocalStrategy((username, password, done) => {
     }else{
       bcrypt.compare(password, user.password, (err, res) => {
       if (res) {
-          return done(null, username);
+          return done(null, user);
         }else{
           return done(null, false, {message: 'bad password'});
         }
@@ -93,9 +94,15 @@ passport.use(new LocalStrategy((username, password, done) => {
   });
 }));
 
-passport.serializeUser((user, done) => done(null, user));
+passport.serializeUser((user, done) => {
+  return done(null, {
+    id: user.id,
+    username: user.username
+  });
+});
 
 passport.deserializeUser((user, done) => {
+  console.log('string deserializing');
   UserModel.findOne({
     where: {
       id: user.id
@@ -125,7 +132,10 @@ app.post('/user/new', (req, res) => {
 
 app.get('/', (req, res) => {
   PhotoModel.findAll().then((photos) => {
-    res.render(`index`, {photos});
+    res.render(`index`, {
+      'photos': photos,
+      'loggedIn': req.user.username
+    });
   });
 });
 
