@@ -131,19 +131,10 @@ app.post('/user/new', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  var templateData = {};
-  console.log(req.user);
-  if (req.user){
-    templateData.loggedIn = req.user.username;
-  }else{
-    templateData.loggedIn = false;
-  }
+  res.locals.loggedIn = (req.user) ? (req.user.username): (false);
   PhotoModel.findAll().then((photos) => {
-  if (photos) {
-    templateData.photos = photos;
-  }
-  console.log(templateData);
-    res.render(`index`, templateData);
+  res.locals.photos = photos;
+    res.render(`index`);
   });
 });
 

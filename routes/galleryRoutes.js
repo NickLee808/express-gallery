@@ -20,6 +20,7 @@ router.post('/test', (req, res) => {
 });
 
 router.route('/:id').get((req, res) => {
+  res.locals.loggedIn = (req.user) ? (req.user.username): (false);
   PhotoModel.findOne({
     where: {
       id: req.params.id
@@ -31,7 +32,7 @@ router.route('/:id').get((req, res) => {
   }).then((photo) => {
     res.render(`details`, {photo});
   });
-}).put((req, res) => {
+}).put(isAuthenticated, (req, res) => {
   PhotoModel.findOne({
     where: {
       id: req.params.id
@@ -45,7 +46,7 @@ router.route('/:id').get((req, res) => {
       res.redirect(303, `/gallery/${photo.id}`);
     });
   });
-}).delete((req, res) => {
+}).delete(isAuthenticated, (req, res) => {
   PhotoModel.findOne({
     where: {
       id: req.params.id
@@ -58,7 +59,7 @@ router.route('/:id').get((req, res) => {
   });
 });
 
-router.route('/').post((req, res) => {
+router.route('/').post(isAuthenticated, (req, res) => {
   PhotoModel.create({
     author: req.body.author,
     link: req.body.link,
@@ -68,7 +69,7 @@ router.route('/').post((req, res) => {
   });
 });
 
-router.route('/:id/edit').get((req, res) => {
+router.route('/:id/edit').get(isAuthenticated, (req, res) => {
   PhotoModel.findOne({
     where: {
       id : req.params.id
@@ -82,7 +83,7 @@ router.route('/:id/edit').get((req, res) => {
   });
 });
 
-router.route('/:id/delete').get((req, res) => {
+router.route('/:id/delete').get(isAuthenticated, (req, res) => {
   PhotoModel.findOne({
     where: {
       id: req.params.id
