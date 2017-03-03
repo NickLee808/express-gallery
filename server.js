@@ -131,12 +131,25 @@ app.post('/user/new', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  var templateData = {};
+  console.log(req.user);
+  if (req.user){
+    templateData.loggedIn = req.user.username;
+  }else{
+    templateData.loggedIn = false;
+  }
   PhotoModel.findAll().then((photos) => {
-    res.render(`index`, {
-      'photos': photos,
-      'loggedIn': req.user.username
-    });
+  if (photos) {
+    templateData.photos = photos;
+  }
+  console.log(templateData);
+    res.render(`index`, templateData);
   });
+});
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
 });
 
 app.listen(3000, _ => db.sequelize.sync());

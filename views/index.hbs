@@ -1,5 +1,15 @@
 <h1><a href ="/">_ARCHITEKT</a></h1>
 
+{{#if loggedIn}}
+<input id="newPhoto" type="submit" onclick="location.href='/gallery/new';" value="NEW PHOTO">
+
+<p>
+
+<input id="logout" type="submit" onclick="location.href='/logout';" value = "LOGOUT">
+
+<p>
+
+{{else}}
 <form action = "/login" method = "POST">
   <div>
     <label>Username:</label>
@@ -8,17 +18,13 @@
   <div>
     <label>Password:</label>
     <input type="password" name="password"/>
-    <input type="submit" value="LOG IN"/>
   </div>
   <div>
+    <input type="submit" value="LOG IN"/>
   </div>
 </form>
 <br>
-
 <input id="newUser" type="submit" onclick="location.href='/register';" value="NEW USER">
-
-{{#if loggedIn}}
-<input id="newPhoto" type="submit" onclick="location.href='/gallery/new';" value="NEW PHOTO">
 {{/if}}
 <p>
 {{#each photos}}  
